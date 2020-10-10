@@ -24,16 +24,16 @@ namespace backend
         private AuthenticateResult HandleAuthenticate()
         {
             var authHeader = this.Request.Headers["Authorization"];
+            var basicScheme = AuthenticationSchemes.Basic.ToString();
             if (string.IsNullOrEmpty(authHeader))
             {
-                this.Response.Headers.Add("WWW-Authenticate", $"Basic realm=\"{this.Options.Realm}\"");
+                this.Response.Headers.Add("WWW-Authenticate", $"{basicScheme} realm=\"{this.Options.Realm}\"");
                 return AuthenticateResult.Fail("No authorization header");
             }
 
             try
             {
                 var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
-                var basicScheme = AuthenticationSchemes.Basic.ToString();
                 if (!authHeaderValue.Scheme.Equals(basicScheme, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Response.Headers.Add("WWW-Authenticate", $"{basicScheme} realm=\"{this.Options.Realm}\"");
@@ -54,7 +54,7 @@ namespace backend
                             },
                             "Password"));
 
-                    return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthenticationSchemes.Basic.ToString()));
+                    return AuthenticateResult.Success(new AuthenticationTicket(principal, basicScheme));
                 }
 
                 return AuthenticateResult.Fail("Unauthorized");

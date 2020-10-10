@@ -27,10 +27,11 @@ namespace frontend
             /** Add the following to wire the client to the backend **/
             services.AddHttpClient<WeatherClient>(client =>
             {
+                var basicAuthCred = $"{this.Configuration["service:backend:username"]}:{this.Configuration["service:backend:password"]}";
+                var basicAuthValue = Convert.ToBase64String(Encoding.ASCII.GetBytes(basicAuthCred));
+
                 client.BaseAddress = this.Configuration.GetServiceUri("backend");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    AuthenticationSchemes.Basic.ToString(),
-                    Convert.ToBase64String(Encoding.ASCII.GetBytes($"{this.Configuration["service:backend:username"]}:{this.Configuration["service:backend:password"]}")));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationSchemes.Basic.ToString(), basicAuthValue);
             });
         }
 
